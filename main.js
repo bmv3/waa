@@ -1,31 +1,32 @@
-// create audio context
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-
 // set basic variables for example
 const myAudio = document.querySelector('audio');
 
 const linearRampMinus = document.querySelector('.linear-ramp-minus');
 
-myAudio.addEventListener('play', () => {
-  audioCtx = new AudioContext();
-  const source = audioCtx.createMediaElementSource(myAudio);
+class Track {
 
-  // Create a gain node and set it's gain value to 0.5
-  const gainNode = audioCtx.createGain();
-  gainNode.gain.value = 0.5;
-  let currGain = gainNode.gain.value;
+  constructor(myAudio) {
+    this.context = new window.AudioContext || window.webkitAudioContext;
+    this.sourceNode = this.context.createMediaElementSource(myAudio);
 
-  // connect the AudioBufferSourceNode to the gainNode
-  // and the gainNode to the destination
-  source.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
+    this.gainNode = this.context.createGain();
 
-  // set buttons to do something onclick
-
-  linearRampMinus.onclick = function() {
-    currGain = 0;
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 5);
+    this.sourceNode.connect(this.gainNode);
+    this.gainNode.connect(this.context.destination);
+    this.gainNode.gain.setValueAtTime(1, this.context.currentTime);
+    this.myAudio = myAudio
   }
+
+  linearRampMinus() {
+    this.gainNode.gain.linearRampToValueAtTime(0, this.context.currentTime + this.long);
+  }
+}
+
+myAudio.addEventListener('play', () => {
+  let waa = new Track(myAudio);
+  
+  waa.long = 15;
+  
+  linearRampMinus.onclick = waa.linearRampMinus.bind(waa);
 
 });
